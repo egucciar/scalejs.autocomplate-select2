@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{CBB3D24D-A50D-45B2-9F11-0907BF96DF42}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <OutputPath>js</OutputPath>
+    <JSLintSkip>\Scripts\</JSLintSkip>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="css\better-autocomplete.css" />
+    <Content Include="Properties\build.rjs" />
+    <Content Include="Properties\scalejs.autocomplete.nuspec">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="scalejs.autocomplete.js" />
+    <Content Include="scalejs.autocomplete\autocomplete.js" />
+    <Content Include="Scripts\jquery.better-autocomplete.js" />
+    <Content Include="Scripts\scalejs-0.3.3.js" />
+    <Content Include="Scripts\text.js" />
+    <Content Include="tools\install.ps1" />
+    <Content Include="tools\uninstall.ps1" />
+    <Content Include="config.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <PropertyGroup>
+    <ScalejsProjectType>Extension</ScalejsProjectType>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>scalejs.autocomplete</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
+  <Import Project="$(SolutionDir)\.scalejs\Scalejs.targets" />
+</Project>

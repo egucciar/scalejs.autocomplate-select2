@@ -1,0 +1,7 @@
+﻿({
+	mainConfigFile: '../config.js',
+    include: 'scalejs.autocomplete',
+    exclude: [
+        'scalejs!core'
+    ]
+})
