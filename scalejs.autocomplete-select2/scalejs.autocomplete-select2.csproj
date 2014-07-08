@@ -9,6 +9,7 @@
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="css\select2.css" />
     <Content Include="Properties\build.rjs" />
     <Content Include="Properties\scalejs.autocomplete-select2.nuspec">
       <SubType>Designer</SubType>
@@ -20,6 +21,7 @@
     <Content Include="Scripts\scalejs.sandbox.js" />
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\_scalejs.intellisense.js" />
+    <Content Include="css\select2-bootstrap.css" />
     <Content Include="tools\install.ps1" />
     <Content Include="tools\uninstall.ps1" />
     <Content Include="config.js" />

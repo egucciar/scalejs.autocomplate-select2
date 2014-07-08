@@ -27,7 +27,6 @@
                     results = mappedData.filter(function (d) {
                         return d.text.indexOf(query.term) === 0;
                     });
-                console.log(results);
                 query.callback({ results: results });
             }
         });
