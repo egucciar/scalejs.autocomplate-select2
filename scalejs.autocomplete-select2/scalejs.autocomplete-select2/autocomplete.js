@@ -9,7 +9,7 @@
     ko,
     $
 ) {
-    'use strict';
+
 
     var // Imports
         observable = ko.observable,
@@ -18,21 +18,22 @@
         isObservable = ko.isObservable,
         merge = core.object.merge;
 
-    function init(element) {
+    function init(element, valueAccessor) {
         var data = valueAccessor();
 
-        alert('Hello World');
         $(element).select2({
             query: function (query) {
-                var results = data.filter(function (d) {
-                    d.indexOf(query) === 0;
-                });
-                query.callback(results);
+                var mappedData = data.map(function (d) { return { text: d }; }),
+                    results = mappedData.filter(function (d) {
+                        return d.text.indexOf(query.term) === 0;
+                    });
+                console.log(results);
+                query.callback({ results: results });
             }
         });
     }
 
-    function update () {
+    function update() {
 
     }
 
