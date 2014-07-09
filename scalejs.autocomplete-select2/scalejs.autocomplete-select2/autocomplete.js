@@ -18,8 +18,13 @@
         isObservable = ko.isObservable,
         merge = core.object.merge;
 
-    function init(element, valueAccessor) {
+    function init (element, valueAccessor, allBindingsAccessor, viewModel) {
+
         var data = valueAccessor();
+
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+            $(element).select2('destroy');
+        });
 
         $(element).select2({
             query: function (query) {
@@ -32,7 +37,12 @@
         });
     }
 
-    function update() {
+    function update (element, valueAccessor, allBindingsAccessor, viewModel) {
+        var allBindings = allBindingsAccessor();
+
+        if ("value" in allBindings) {
+            $(element).select2("data", allBindings.value());
+        }
 
     }
 
