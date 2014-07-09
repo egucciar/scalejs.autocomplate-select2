@@ -26,22 +26,15 @@
             $(element).select2('destroy');
         });
 
-        $(element).select2({
-            query: function (query) {
-                var mappedData = data.map(function (d) { return { text: d }; }),
-                    results = mappedData.filter(function (d) {
-                        return d.text.indexOf(query.term) === 0;
-                    });
-                query.callback({ results: results });
-            }
-        });
+        $(element).select2(valueAccessor());
     }
 
     function update (element, valueAccessor, allBindingsAccessor, viewModel) {
-        var allBindings = allBindingsAccessor();
+        var allBindings = allBindingsAccessor(),
+            value = ko.utils.unwrapObservable(allBindings.value || allBindings.selectedOptions);
 
-        if ("value" in allBindings) {
-            $(element).select2("data", allBindings.value());
+        if (value) {
+            $(element).select2('val', value);
         }
 
     }
