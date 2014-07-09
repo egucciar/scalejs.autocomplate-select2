@@ -20,19 +20,23 @@
 
     function init (element, valueAccessor, allBindingsAccessor, viewModel) {
 
-        var value = valueAccessor();
+        var value = valueAccessor(),
+            select2 = value.select2;
 
         ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
             $(element).select2('destroy');
         });
 
-        if (value.select2 === undefined) {
-            value.select2 = {};
+        if ( select2 === undefined) {
+            select2 = {};
         }
 
-        value.select2.data = value.data();
+        select2.data = value.data();
 
         $(element).select2(value.select2);
+
+        $(element).on("change", function (o) { value.selectedItem(o.val) });
+
     }
 
     function update (element, valueAccessor, allBindingsAccessor, viewModel) {
