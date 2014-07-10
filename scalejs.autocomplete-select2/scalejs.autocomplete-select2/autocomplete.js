@@ -37,6 +37,10 @@
             value.userInput($(".select2-input").val());
         });
 
+        $(element).on("select2-open", function (o) {
+            $(".select2-input").val(value.userInput());
+        });
+
         // Set up the disposal of select2
         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
             $(element).select2('destroy');
