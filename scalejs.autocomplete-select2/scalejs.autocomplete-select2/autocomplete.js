@@ -9,7 +9,7 @@
     ko,
     $
 ) {
-
+    "use strict";
 
     var // Imports
         observable = ko.observable,
@@ -21,24 +21,31 @@
     function init (element, valueAccessor, allBindingsAccessor, viewModel) {
 
         var value = valueAccessor(),
-            select2 = value.select2;
+            select2 = value.select2,
+            container,
+            input;
 
+
+        // Set up object to pass to select2 with all it's configuration properties
         if ( select2 === undefined) {
             select2 = {};
         }
-
         select2.data = value.data();
+        $(element).select2(select2);
 
-        $(element).select2(value.select2);
-
+        // Make sure knockout updates correctly
         $(element).on("change", function (o) { value.selectedItem(o.val) });
 
-        $(".select2-input").on("keyup", function (o) {
-            value.userInput($(".select2-input").val());
+        // Handle the user text input
+        container = $(element).select2("container");
+        input = $(container).find(".select2-drop .select2-search .select2-input");
+
+        $(input).on("keyup", function (o) {
+            value.userInput($(input).val());
         });
 
         $(element).on("select2-open", function (o) {
-            $(".select2-input").val(value.userInput());
+            $(input).val(value.userInput());
         });
 
         // Set up the disposal of select2
