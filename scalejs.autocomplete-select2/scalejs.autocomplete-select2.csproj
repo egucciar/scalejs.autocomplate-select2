@@ -9,7 +9,9 @@
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="css\select2-spinner.gif" />
     <Content Include="css\select2.css" />
+    <Content Include="css\select2.png" />
     <Content Include="Properties\build.rjs" />
     <Content Include="Properties\scalejs.autocomplete-select2.nuspec">
       <SubType>Designer</SubType>

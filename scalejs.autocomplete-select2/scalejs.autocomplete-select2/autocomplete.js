@@ -23,10 +23,6 @@
         var value = valueAccessor(),
             select2 = value.select2;
 
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
-            $(element).select2('destroy');
-        });
-
         if ( select2 === undefined) {
             select2 = {};
         }
@@ -36,6 +32,15 @@
         $(element).select2(value.select2);
 
         $(element).on("change", function (o) { value.selectedItem(o.val) });
+
+        $(".select2-input").on("keyup", function (o) {
+            value.userInput($(".select2-input").val());
+        });
+
+        // Set up the disposal of select2
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+            $(element).select2('destroy');
+        });
 
     }
 
