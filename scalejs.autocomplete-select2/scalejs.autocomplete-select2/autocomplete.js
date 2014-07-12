@@ -30,20 +30,31 @@
         if ( select2 === undefined) {
             select2 = {};
         }
-        select2.data = value.data();
+        if (value.itemsToShow) {
+            select2.data = function () {
+                return { results: value.itemsToShow() };
+            }
+        } else {
+            select2.data = value.data();
+        }
         $(element).select2(select2);
 
         // Make sure knockout updates correctly
-        $(element).on("change", function (o) { value.selectedItem(o.val) });
+        $(element).on("change", function (o) {
+            value.selectedItem(o.val)
+        });
 
-        // Handle the user text input
+        // ----Handle the user text input----
+
         container = $(element).select2("container");
         input = $(container).find(".select2-drop .select2-search .select2-input");
 
+        // Push the user input to the viewmodel
         $(input).on("keyup", function (o) {
             value.userInput($(input).val());
         });
 
+        // Make sure that the last user input repopulates the input box when reopened
         $(element).on("select2-open", function (o) {
             $(input).val(value.userInput());
         });
@@ -56,19 +67,10 @@
     }
 
     function update (element, valueAccessor, allBindingsAccessor, viewModel) {
-        var allBindings = allBindingsAccessor(),
-            value = ko.utils.unwrapObservable(allBindings.value || allBindings.selectedOptions);
-
-        if (value) {
-            $(element).select2('val', value);
-        }
-
-
-
+        var value = valueAccessor();
     }
 
     return {
-        init: init,
-        update: update
+        init: init
     };
 });
