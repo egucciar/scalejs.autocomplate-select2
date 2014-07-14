@@ -26,7 +26,7 @@
             container,
             input,
             // Temporary variables
-            queryDisposable,
+            queryComputed,
             data;
 
 
@@ -37,13 +37,17 @@
         // If they passed itemsToShow, display all of them, else let select2 handle the search
         if (value.itemsToShow) {
             select2.query = function (query) {
-                data = {
-                    results: []
+                if (queryComputed) {
+                    queryComputed.dispose();
                 }
-                value.itemsToShow().forEach(function (d) {
-                    data.results.push(d);
-                });
-                query.callback(data);
+                queryComputed = computed(function () {
+                    data = {
+                        results: []
+                    }
+                    value.itemsToShow().forEach(function (d) {
+                        data.results.push(d);
+                    });
+                    query.callback(data);
             }
         } else {
             select2.data = value.data();
@@ -52,7 +56,7 @@
 
         // Make sure knockout updates correctly
         $(element).on("change", function (o) {
-            value.selectedItem(o.val)
+            value.selectedItem(o.val);
         });
 
         // ----Handle the user text input----
