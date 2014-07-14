@@ -16,7 +16,8 @@
         computed = ko.computed,
         unwrap = ko.unwrap,
         isObservable = ko.isObservable,
-        merge = core.object.merge;
+        merge = core.object.merge,
+        is = core.type.is;
 
     function init (element, valueAccessor, allBindingsAccessor, viewModel) {
 
@@ -42,11 +43,12 @@
                 }
                 queryComputed = computed(function () {
                     data = {
-                        results: []
+                        results: value.itemsToShow()
                     }
-                    value.itemsToShow().forEach(function (d) {
-                        data.results.push(d);
-                    });
+                    if (!is(data.results, 'array')) {
+                        console.warn('itemsToShow must return an array');
+                        data.results = [];
+                    }
                     query.callback(data);
                 });
             }
@@ -80,10 +82,6 @@
             $(element).select2('destroy');
         });
 
-    }
-
-    function update (element, valueAccessor, allBindingsAccessor, viewModel) {
-        var value = valueAccessor();
     }
 
     return {
