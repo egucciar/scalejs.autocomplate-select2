@@ -37,18 +37,13 @@
         // If they passed itemsToShow, display all of them, else let select2 handle the search
         if (value.itemsToShow) {
             select2.query = function (query) {
-                if (queryDisposable) {
-                    queryDisposable();
+                data = {
+                    results: []
                 }
-                queryDisposable = value.itemsToShow.subscribe(function () {
-                    data = {
-                        results: []
-                    }
-                    value.itemsToShow().forEach(function (d) {
-                        data.results.push(d);
-                    });
-                    query.callback(data);
+                value.itemsToShow().forEach(function (d) {
+                    data.results.push(d);
                 });
+                query.callback(data);
             }
         } else {
             select2.data = value.data();
