@@ -26,7 +26,7 @@
             container,
             input,
             // Temporary variables
-            queryFunction,
+            queryDisposable,
             data;
 
 
@@ -37,7 +37,10 @@
         // If they passed itemsToShow, display all of them, else let select2 handle the search
         if (value.itemsToShow) {
             select2.query = function (query) {
-                queryFunction = computed(function () {
+                if (queryDisposable) {
+                    queryDisposable();
+                }
+                queryDisposable = value.itemsToShow.subscribe(function () {
                     data = {
                         results: []
                     }
