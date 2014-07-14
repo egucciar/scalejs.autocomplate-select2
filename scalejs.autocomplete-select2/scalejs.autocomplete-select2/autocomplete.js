@@ -48,6 +48,7 @@
                         data.results.push(d);
                     });
                     query.callback(data);
+                });
             }
         } else {
             select2.data = value.data();
