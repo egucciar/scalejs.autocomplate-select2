@@ -20,19 +20,32 @@
 
     function init (element, valueAccessor, allBindingsAccessor, viewModel) {
 
-        var value = valueAccessor(),
+        var // Scope variables
+            value = valueAccessor(),
             select2 = value.select2,
             container,
-            input;
+            input,
+            // Temporary variables
+            queryFunction,
+            data;
 
 
-        // Set up object to pass to select2 with all it's configuration properties
+        // ----Set up object to pass to select2 with all it's configuration properties----
         if ( select2 === undefined) {
             select2 = {};
-        }
+        } 
+        // If they passed itemsToShow, display all of them, else let select2 handle the search
         if (value.itemsToShow) {
-            select2.data = function () {
-                return { results: value.itemsToShow() };
+            select2.query = function (query) {
+                queryFunction = computed(function () {
+                    data = {
+                        results: []
+                    }
+                    value.itemsToShow().forEach(function (d) {
+                        data.results.push(d);
+                    });
+                    query.callback(data);
+                });
             }
         } else {
             select2.data = value.data();
@@ -59,7 +72,7 @@
             $(input).val(value.userInput());
         });
 
-        // Set up the disposal of select2
+        // ----Set up the disposal of select2----
         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
             $(element).select2('destroy');
         });
