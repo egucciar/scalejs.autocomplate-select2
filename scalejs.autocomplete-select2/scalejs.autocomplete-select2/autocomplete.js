@@ -82,7 +82,7 @@
                 });
             }
         } else if (data) {
-            if (data.isObservable()) {
+            if (isObservable(data)) {
                 select2.data = function () {
                     return { results: mapArray(data(), idpath, textpath) };
                 }
