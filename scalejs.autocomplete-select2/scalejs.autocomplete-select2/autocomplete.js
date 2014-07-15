@@ -84,12 +84,12 @@
         } else if (data) {
             if (isObservable(data)) {
                 select2.data = function () {
-                    return { results: mapArray(data(), idpath, textpath) };
+                    var results = mapArray(data(), idpath, textpath)
+                    return { results: results };
                 }
             } else {// its just a plain array
-                data = mapArray(data, idpath, textpath);
+                select2.data = mapArray(data, idpath, textpath);
             }
-            select2.data = data;
         }
 
         // ----handle templating----
