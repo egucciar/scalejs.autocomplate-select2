@@ -21,7 +21,7 @@
 
     function mapArray(array, idpath, textpath) {
         return array.map(function (d) {
-            var id = (is(idpath, 'string')) ? idpath : d,
+            var id = (idpath) ? d[idpath] : d,
                 text;
 
             if (textpath) {
@@ -46,25 +46,33 @@
             createFormatFunction,
             container,
             input,
+            // Important Values from accessor
+            itemsToShow =           value.itemsToShow,
+            itemTemplate =          value.itemTemplate,
+            selectedItemTemplate =  value.selectedItemTemplate,
+            idpath =                value.idpath,
+            textpath =              value.textpath,
+            userInput =             value.userInput,
+            selectedItem =          value.selectedItem,
+            data =                  value.data,
             // Temporary variables
             formatFunction,
             dummyDiv,
-            queryComputed,
-            data;
+            queryComputed;
 
         // ----Set up object to pass to select2 with all it's configuration properties----
         if ( select2 === undefined) {
             select2 = {};
         } 
         // If they passed itemsToShow, display all of them, else let select2 handle the search
-        if (value.itemsToShow) {
+        if (itemsToShow) {
             select2.query = function (query) {
                 if (queryComputed) {
                     queryComputed.dispose();
                 }
                 queryComputed = computed(function () {
                     data = {
-                        results: value.itemsToShow()
+                        results: itemsToShow()
                     }
                     if (!is(data.results, 'array')) {
                         console.warn('itemsToShow must return an array');
@@ -73,18 +81,19 @@
                     query.callback(data);
                 });
             }
-        } else if (value.data) {
-            data = value.data();
-            if (is(data[0], 'string')) {
-                data = data.map(function (d) {
-                    return { id: d, text: d };
-                });
+        } else if (data) {
+            if (data.isObservable()) {
+                select2.data = function () {
+                    return { results: mapArray(data(), idpath, textpath) };
+                }
+            } else {// its just a plain array
+                data = mapArray(data, idpath, textpath);
             }
             select2.data = data;
         }
 
         // ----handle templating----
-        if (value.itemTemplate || value.selectedItemTemplate) {
+        if ( itemTemplate ) {
 
             // Create div to render templates inside to get the html to pass to select2
             $('body').append('<div id="dummy_div" data-bind="template: { name: template, data: data }"></div>');
@@ -97,19 +106,18 @@
                     // Clear Dummy Div html node
                     dummyDiv.innerText = '';
                     // render template with (d)
-                    ko.applyBindings({ template: templateString, data: (value.idpath)? d[value.idpath] : d }, dummyDiv);
+                    ko.applyBindings({ template: templateString, data: (idpath)? d : d.id }, dummyDiv);
 
                     // give rendered data to select2
                     return dummyDiv.innerHTML;
                 }
             }
 
-            if (value.itemTemplate) {
-                select2.formatResult = createFormatFunction(value.itemTemplate);
-            }
+            select2.formatResult = createFormatFunction(itemTemplate);
+            select2.formatSelection = select2.formatResult;
 
-            if (value.selectedItemTemplate) {
-                select2.formatSelection = createFormatFunction(value.selectedItemTemplate);
+            if (selectedItemTemplate) {
+                select2.formatSelection = createFormatFunction(selectedItemTemplate);
             }
             if (!select2.hasOwnProperty('escapeMarkup')) {
                 select2.escapeMarkup = function (m) { return m; }
@@ -121,7 +129,7 @@
 
         // Make sure knockout updates correctly
         $(element).on("change", function (o) {
-            value.selectedItem(o.val);
+            selectedItem(o.val);
         });
 
         // ----Handle the user text input----
@@ -129,15 +137,17 @@
         container = $(element).select2("container");
         input = $(container).find(".select2-drop .select2-search .select2-input");
 
-        // Push the user input to the viewmodel
-        $(input).on("keyup", function (o) {
-            value.userInput($(input).val());
-        });
+        if (userInput) {
+            // Push the user input to the viewmodel
+            $(input).on("keyup", function (o) {
+                userInput($(input).val());
+            });
 
-        // Make sure that the last user input repopulates the input box when reopened
-        $(element).on("select2-open", function (o) {
-            $(input).val(value.userInput());
-        });
+            // Make sure that the last user input repopulates the input box when reopened
+            $(element).on("select2-open", function (o) {
+                $(input).val(userInput());
+            });
+        }
 
         // ----Set up the disposal of select2----
         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
