@@ -24,6 +24,7 @@
         var // Scope variables
             value = valueAccessor(),
             select2 = value.select2,
+            createFormatFunction,
             container,
             input,
             // Temporary variables
@@ -59,25 +60,26 @@
         }
 
         // ----handle templating----
-        if ( value.itemTemplate ) {
+        if ( value.itemTemplate || value.selectedItemTemplate ) {
             $('body').append('<div id="dummy_div" data-bind="template: { name: template, data: data }"></div>');
             dummyDiv = document.getElementById("dummy_div");
             $(dummyDiv).hide();
 
-            formatFunction = function (d) {
-                ko.cleanNode(dummyDiv);
-                // Clear Dummy Div html node
-                dummyDiv.innerText = '';
-                // render template with (d)
-                ko.applyBindings({ template: value.itemTemplate, data: d }, dummyDiv);
+            createFormatFunction = function (templateString) {
+                return function (d) {
+                    ko.cleanNode(dummyDiv);
+                    // Clear Dummy Div html node
+                    dummyDiv.innerText = '';
+                    // render template with (d)
+                    ko.applyBindings({ template: templateString, data: d }, dummyDiv);
 
-                // give rendered data to select2
-                return dummyDiv.innerHTML;
-
+                    // give rendered data to select2
+                    return dummyDiv.innerHTML;
+                }
             }
 
-            select2.formatResult = formatFunction;
-            select2.formatSelection = formatFunction;
+            select2.formatResult = createFormatFunction(value.itemTemplate);
+            select2.formatSelection = select2.formatResult;
             select2.escapeMarkup = function(m) { return m; }
         }
 
