@@ -27,10 +27,12 @@
             container,
             input,
             // Temporary variables
+            formatFunction,
+            dummyDiv,
             queryComputed,
             data;
 
-
+        var testfunc = 'fuck you conor'
         // ----Set up object to pass to select2 with all it's configuration properties----
         if ( select2 === undefined) {
             select2 = {};
@@ -55,6 +57,31 @@
         } else {
             select2.data = value.data();
         }
+
+        // ----handle templating----
+        if ( value.itemTemplate ) {
+            $('body').append('<div id="dummy_div" data-bind="template: { name: template, data: data }"></div>');
+            dummyDiv = document.getElementById("dummy_div");
+            $(dummyDiv).hide();
+
+            formatFunction = function (d) {
+                ko.cleanNode(dummyDiv);
+                // Clear Dummy Div html node
+                dummyDiv.innerText = '';
+                // render template with (d)
+                ko.applyBindings({ template: value.itemTemplate, data: d }, dummyDiv);
+
+                // give rendered data to select2
+                return dummyDiv.innerHTML;
+
+            }
+
+            select2.formatResult = formatFunction;
+            select2.formatSelection = formatFunction;
+            select2.escapeMarkup = function(m) { return m; }
+        }
+
+        // Pass all the set up properties to the select2 constructor and instantiate the select2 box
         $(element).select2(select2);
 
         // Make sure knockout updates correctly
@@ -81,7 +108,6 @@
         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
             $(element).select2('destroy');
         });
-
     }
 
     return {
