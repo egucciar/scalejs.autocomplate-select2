@@ -19,11 +19,30 @@
         merge = core.object.merge,
         is = core.type.is;
 
-    function init (element, valueAccessor, allBindingsAccessor, viewModel) {
+    function mapArray(array, idpath, textpath) {
+        return array.map(function (d) {
+            var id = (is(idpath, 'string')) ? idpath : d,
+                text;
+
+            if (textpath) {
+                text = d[textpath];
+            } else if (is(d, 'string')) {
+                text = d;
+            } else {
+                console.warn('Input has not specified text field');
+                text = "";
+            }
+
+            return { id: id, text: text }
+        })
+    }
+
+    function initializeSelect2 (element, valueAccessor, allBindingsAccessor, viewModel) {
 
         var // Scope variables
             value = valueAccessor(),
             select2 = value.select2,
+            userIsHandlingFormatting,
             createFormatFunction,
             container,
             input,
@@ -33,7 +52,6 @@
             queryComputed,
             data;
 
-        var testfunc = 'fuck you conor'
         // ----Set up object to pass to select2 with all it's configuration properties----
         if ( select2 === undefined) {
             select2 = {};
@@ -55,7 +73,7 @@
                     query.callback(data);
                 });
             }
-        } else {
+        } else if (value.data) {
             data = value.data();
             if (is(data[0], 'string')) {
                 data = data.map(function (d) {
@@ -66,7 +84,9 @@
         }
 
         // ----handle templating----
-        if ( value.itemTemplate || value.selectedItemTemplate ) {
+        if (value.itemTemplate || value.selectedItemTemplate) {
+
+            // Create div to render templates inside to get the html to pass to select2
             $('body').append('<div id="dummy_div" data-bind="template: { name: template, data: data }"></div>');
             dummyDiv = document.getElementById("dummy_div");
             $(dummyDiv).hide();
@@ -77,7 +97,7 @@
                     // Clear Dummy Div html node
                     dummyDiv.innerText = '';
                     // render template with (d)
-                    ko.applyBindings({ template: templateString, data: d }, dummyDiv);
+                    ko.applyBindings({ template: templateString, data: (value.idpath)? d[value.idpath] : d }, dummyDiv);
 
                     // give rendered data to select2
                     return dummyDiv.innerHTML;
@@ -91,8 +111,9 @@
             if (value.selectedItemTemplate) {
                 select2.formatSelection = createFormatFunction(value.selectedItemTemplate);
             }
-
-            select2.escapeMarkup = function(m) { return m; }
+            if (!select2.hasOwnProperty('escapeMarkup')) {
+                select2.escapeMarkup = function (m) { return m; }
+            }
         }
 
         // Pass all the set up properties to the select2 constructor and instantiate the select2 box
@@ -122,6 +143,10 @@
         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
             $(element).select2('destroy');
         });
+    }
+
+    function init(element, valueAccessor, allBindingsAccessor, viewModel) {
+        initializeSelect2(element, valueAccessor, allBindingsAccessor, viewModel);
     }
 
     return {
