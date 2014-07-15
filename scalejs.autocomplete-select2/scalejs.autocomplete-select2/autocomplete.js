@@ -56,7 +56,13 @@
                 });
             }
         } else {
-            select2.data = value.data();
+            data = value.data();
+            if (is(data[0], 'string')) {
+                data = data.map(function (d) {
+                    return { id: d, text: d };
+                });
+            }
+            select2.data = data;
         }
 
         // ----handle templating----
