@@ -78,8 +78,14 @@
                 }
             }
 
-            select2.formatResult = createFormatFunction(value.itemTemplate);
-            select2.formatSelection = select2.formatResult;
+            if (value.itemTemplate) {
+                select2.formatResult = createFormatFunction(value.itemTemplate);
+            }
+
+            if (value.selectedItemTemplate) {
+                select2.formatSelection = createFormatFunction(value.selectedItemTemplate);
+            }
+
             select2.escapeMarkup = function(m) { return m; }
         }
 
