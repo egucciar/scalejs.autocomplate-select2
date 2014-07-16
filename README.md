@@ -39,11 +39,11 @@ The user's selection is returned to the viewmodel through the knockout observabl
 
 ## Adaptive Input
 
-Instead of providing data using the ```data``` paramater in the select2 object, data can also be passed using the ```data``` parameter in this binding. The autocomplete ```data``` paramater accepts an array that contains either strings or objects. If the array contains strings, autocomple will map it correctly for select2 and take care of all the details. If the array contains objects, the ```textpath``` parameter must be sent to specify the property of the object that containts the string to be rendered if no template is provided. Likewise, the ```idpath``` parameter must be provided to specify which property contains the data returned on selection, else the entire object will be the selected value.
+Instead of providing data using the ```data``` paramater in the select2 object, data can also be passed using the ```itemsSource``` parameter in this binding. The autocomplete ```itemsSource``` parameter accepts an array that contains either strings or objects. If the array contains strings, autocomple will map it correctly for select2 and take care of all the details. If the array contains objects, the ```textpath``` parameter must be sent to specify the property of the object that containts the string to be rendered if no template is provided. Likewise, the ```idpath``` parameter must be provided to specify which property contains the data returned on selection, else the entire object will be the selected value.
 
 ## Dynamic Data Loading
 
-The ```data``` parameter instead of taking an array can also take an observable. If an observable is passed, before every search the binding will get the most updated value it contains and use that to search from.
+The ```itemsSource``` parameter instead of taking an array can also take an observable. If an observable is passed, before every search the binding will get the most updated value it contains and use that to search from.
 
 ## Viewmodel Filtering
 
