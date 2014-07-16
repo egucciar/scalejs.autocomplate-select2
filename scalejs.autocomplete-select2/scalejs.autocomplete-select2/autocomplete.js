@@ -1,4 +1,5 @@
-﻿define([
+﻿/*global define, console, document*/
+define([
     'scalejs!core',
     'knockout',
     'jQuery',
@@ -22,7 +23,7 @@
     // Take an array and return an array compatible with select2
     function mapArray(array, idpath, textpath, childpath) {
         return array.map(function (d) {
-            var id = (idpath) ? d[idpath] : d,
+            var id = idpath ? d[idpath] : d,
                 text;
 
             if (textpath) {
@@ -35,14 +36,13 @@
             }
 
             if (childpath) {
-                return { text: text, children: d[childpath]}
-            } else {
-                return { text: text, id: id }
+                return { text: text, children: d[childpath] };
             }
-        })
+            return { text: text, id: id };
+        });
     }
 
-    function initializeSelect2 (element, valueAccessor, allBindingsAccessor, viewModel) {
+    function initializeSelect2(element, valueAccessor) {
 
         var // Scope variables
             value = valueAccessor(),
@@ -62,14 +62,13 @@
             selectedItem =          value.selectedItem,
             data =                  value.itemsSource,
             // Temporary variables
-            formatFunction,
             dummyDiv,
             queryComputed;
 
         // ----Set up object to pass to select2 with all it's configuration properties----
-        if ( select2 === undefined) {
+        if (select2 === undefined) {
             select2 = {};
-        } 
+        }
         // If they passed itemsToShow, display all of them, else let select2 handle the search
         if (itemsToShow) {
             select2.query = function (query) {
@@ -77,29 +76,27 @@
                     queryComputed.dispose();
                 }
                 queryComputed = computed(function () {
-                    data = {
-                        results: mapArray(itemsToShow(), idpath, textpath, childpath)
-                    }
+                    data = { results: mapArray(itemsToShow(), idpath, textpath, childpath) };
                     if (!is(data.results, 'array')) {
                         console.warn('itemsToShow must return an array');
                         data.results = [];
                     }
                     query.callback(data);
                 });
-            }
+            };
         } else if (data) {
             if (isObservable(data)) {
                 select2.data = function () {
-                    var results = mapArray(data(), idpath, textpath, childpath)
+                    var results = mapArray(data(), idpath, textpath, childpath);
                     return { results: results };
-                }
+                };
             } else {// its just a plain array
                 select2.data = mapArray(data, idpath, textpath, childpath);
             }
         }
 
         // ----handle templating----
-        if ( itemTemplate ) {
+        if (itemTemplate) {
 
             // Create div to render templates inside to get the html to pass to select2
             $('body').append('<div id="dummy_div" data-bind="template: { name: template, data: data }"></div>');
@@ -112,12 +109,12 @@
                     // Clear Dummy Div html node
                     dummyDiv.innerText = '';
                     // render template with (d)
-                    ko.applyBindings({ template: templateString, data: (idpath)? d : d.id }, dummyDiv);
+                    ko.applyBindings({ template: templateString, data: idpath ? d : d.id }, dummyDiv);
 
                     // give rendered data to select2
                     return dummyDiv.innerHTML;
-                }
-            }
+                };
+            };
 
             select2.formatResult = createFormatFunction(itemTemplate);
             select2.formatSelection = select2.formatResult;
@@ -126,7 +123,7 @@
                 select2.formatSelection = createFormatFunction(selectedItemTemplate);
             }
             if (!select2.hasOwnProperty('escapeMarkup')) {
-                select2.escapeMarkup = function (m) { return m; }
+                select2.escapeMarkup = function (m) { return m; };
             }
         }
 
@@ -145,12 +142,12 @@
 
         if (userInput) {
             // Push the user input to the viewmodel
-            $(input).on("keyup", function (o) {
+            $(input).on("keyup", function () {
                 userInput($(input).val());
             });
 
             // Make sure that the last user input repopulates the input box when reopened
-            $(element).on("select2-open", function (o) {
+            $(element).on("select2-open", function () {
                 $(input).val(userInput());
             });
         }
