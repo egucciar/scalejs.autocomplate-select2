@@ -29,7 +29,7 @@
                 text = d[textpath];
             } else if (is(d, 'string')) {
                 text = d;
-            } else {
+            } else { //TODO add isformatted boolean and base this off that
                 console.warn('Input has not specified text field');
                 text = "";
             }
