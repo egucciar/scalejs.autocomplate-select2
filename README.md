@@ -3,22 +3,6 @@ scalejs.autocomplete-select2
 
 An autocomplete extension for scalejs based on Select2. This extension provides a way to use select2 and many of its advanced features while still following scalejs patterns. 
 
-# Example Binding
-
-```javascript
-autocomplete: {
-  select2: {
-    placeholder: 'Placeholder Text',
-    allowClear: true
-  },
-  selectedItem: this.selectedItem1,
-  userInput: this.userInput1,
-  itemsToShow: this.itemsToShow,
-  textpath: 'text',
-  idpath: 'id'
-}
-```
-
 # Features
 
 ## Direct Passing to Select2
@@ -48,3 +32,38 @@ The ```itemsSource``` parameter instead of taking an array can also take an obse
 ## Viewmodel Filtering
 
 If a user provides a computed function that computes an array of results based on the ```userInput``` observable, then instead of using select2's search, the binding will use the returned array as the results for the search, allowing for all comparision and filtering logic to be done in the viewmodel.
+
+# Examples
+
+## Simplest Binding
+
+```javascript
+autocomplete: {
+    itemsSource = ['a', 'b', 'c'],
+    selectedItem = this.anyObservable
+}
+```
+
+## Complex Binding
+
+```javascript
+autocomplete: {
+    select2: {
+        placeholder: 'Placeholder Text',
+        allowClear: true
+    },
+    selectedItem: this.selectedItem1,
+    userInput: this.userInput1,
+    itemsToShow: this.itemsToShow,
+    textpath: 'text',
+    idpath: 'id'
+}
+```
+
+# Browser Compatibility
+
+* IE 8+
+* Chrome 8+
+* Firefox 10+
+* Safari 3+
+* Opera 10.6+
