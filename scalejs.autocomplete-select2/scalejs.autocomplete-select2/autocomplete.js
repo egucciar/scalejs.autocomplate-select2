@@ -19,6 +19,7 @@
         merge = core.object.merge,
         is = core.type.is;
 
+    // Take an array and return an array compatible with select2
     function mapArray(array, idpath, textpath) {
         return array.map(function (d) {
             var id = (idpath) ? d[idpath] : d,
@@ -52,9 +53,9 @@
             selectedItemTemplate =  value.selectedItemTemplate,
             idpath =                value.idpath,
             textpath =              value.textpath,
-            userInput =             value.userInput,
+            userInput =             value.queryText,
             selectedItem =          value.selectedItem,
-            data =                  value.data,
+            data =                  value.itemsSource,
             // Temporary variables
             formatFunction,
             dummyDiv,
