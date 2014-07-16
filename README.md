@@ -60,6 +60,10 @@ autocomplete: {
 }
 ```
 
+# Installation
+
+Just install [this nuget package](https://www.nuget.org/packages/scalejs.autocomplete-select2/)
+
 # Browser Compatibility
 
 * IE 8+
