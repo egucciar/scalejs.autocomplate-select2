@@ -52,11 +52,11 @@ autocomplete: {
         placeholder: 'Placeholder Text',
         allowClear: true
     },
-    selectedItem: this.selectedItem1,
-    userInput: this.userInput1,
-    itemsToShow: this.itemsToShow,
-    textpath: 'text',
-    idpath: 'id'
+    selectedItem: this.someObservable,
+    userInput: this.anotherObservable,
+    itemsToShow: this.computedFilteringFunction,
+    textpath: 'textproperty',
+    idpath: 'idproperty'
 }
 ```
 
