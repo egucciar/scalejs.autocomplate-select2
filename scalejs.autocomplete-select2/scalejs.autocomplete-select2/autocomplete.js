@@ -20,7 +20,7 @@
         is = core.type.is;
 
     // Take an array and return an array compatible with select2
-    function mapArray(array, idpath, textpath) {
+    function mapArray(array, idpath, textpath, childpath) {
         return array.map(function (d) {
             var id = (idpath) ? d[idpath] : d,
                 text;
@@ -34,7 +34,11 @@
                 text = "";
             }
 
-            return { id: id, text: text }
+            if (childpath) {
+                return { text: text, children: d[childpath]}
+            } else {
+                return { text: text, id: id }
+            }
         })
     }
 
@@ -53,6 +57,7 @@
             selectedItemTemplate =  value.selectedItemTemplate,
             idpath =                value.idpath,
             textpath =              value.textpath,
+            childpath =             value.childpath,
             userInput =             value.queryText,
             selectedItem =          value.selectedItem,
             data =                  value.itemsSource,
@@ -73,7 +78,7 @@
                 }
                 queryComputed = computed(function () {
                     data = {
-                        results: mapArray(itemsToShow(), idpath, textpath)
+                        results: mapArray(itemsToShow(), idpath, textpath, childpath)
                     }
                     if (!is(data.results, 'array')) {
                         console.warn('itemsToShow must return an array');
@@ -85,11 +90,11 @@
         } else if (data) {
             if (isObservable(data)) {
                 select2.data = function () {
-                    var results = mapArray(data(), idpath, textpath)
+                    var results = mapArray(data(), idpath, textpath, childpath)
                     return { results: results };
                 }
             } else {// its just a plain array
-                select2.data = mapArray(data, idpath, textpath);
+                select2.data = mapArray(data, idpath, textpath, childpath);
             }
         }
 
