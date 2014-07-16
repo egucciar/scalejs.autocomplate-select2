@@ -72,7 +72,7 @@
                 }
                 queryComputed = computed(function () {
                     data = {
-                        results: itemsToShow()
+                        results: mapArray(itemsToShow(), idpath, textpath)
                     }
                     if (!is(data.results, 'array')) {
                         console.warn('itemsToShow must return an array');
