@@ -42,7 +42,7 @@ define([
     }
 
     // Take an array and return an array compatible with select2
-    function mapArray(array, idPath, textPath, childPath, selectableParents) {
+    function mapArray(array, idPath, textPath, childPath, selectGroupNodes) {
         return array.map(function (d) {
             var children,
                 id,
@@ -64,14 +64,14 @@ define([
             // ----Deal with nodes with children----
             if (d.hasOwnProperty(currentChildPath)) {
                 children = mapArray(d[currentChildPath], getNextProperty(idPath), getNextProperty(textPath), getNextProperty(childPath))
-                if (!selectableParents) {
+                if (!selectGroupNodes) {
                     return { text: text, children: children };
                 }
             }
 
             // ----Deal with object nodes----
             id = currentIDPath ? d[currentIDPath] : d;
-            if (selectableParents) {
+            if (selectGroupNodes) {
                 return { text: text, id: id, children: children };
             }
             return { text: text, id: id };
@@ -98,7 +98,7 @@ define([
             userInput =             value.queryText,
             selectedItem =          value.selectedItem,
             data =                  value.itemsSource,
-            selectableParents =     value.selectableParents,
+            selectGroupNodes = value.selectGroupNodes,
             // Temporary variables
             dummyDiv,
             queryComputed;
@@ -114,7 +114,7 @@ define([
                     queryComputed.dispose();
                 }
                 queryComputed = computed(function () {
-                    data = { results: mapArray(itemsToShow(), idpath, textpath, childpath, selectableParents) };
+                    data = { results: mapArray(itemsToShow(), idpath, textpath, childpath, selectGroupNodes) };
                     if (!is(data.results, 'array')) {
                         console.warn('itemsToShow must return an array');
                         data.results = [];
@@ -125,11 +125,11 @@ define([
         } else if (data) {
             if (isObservable(data)) {
                 select2.data = function () {
-                    var results = mapArray(data(), idpath, textpath, childpath, selectableParents);
+                    var results = mapArray(data(), idpath, textpath, childpath, selectGroupNodes);
                     return { results: results };
                 };
             } else {// its just a plain array
-                select2.data = mapArray(data, idpath, textpath, childpath, selectableParents);
+                select2.data = mapArray(data, idpath, textpath, childpath, selectGroupNodes);
             }
         }
 
