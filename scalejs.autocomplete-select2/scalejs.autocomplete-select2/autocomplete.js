@@ -20,25 +20,57 @@ define([
         merge = core.object.merge,
         is = core.type.is;
 
-    // Take an array and return an array compatible with select2
-    function mapArray(array, idpath, textpath, childpath) {
-        return array.map(function (d) {
-            var id = idpath ? d[idpath] : d,
-                text;
+    function getProperty(path) {
+        if (is(path, 'string')) {
+            return path;
+        }
+        if (is(path, 'array') && path.length > 0) {
+            return path[0];
+        }
+        return undefined;
+    }
 
-            if (textpath) {
-                text = d[textpath];
+    // Get the childpath for the next level of heiarchical data
+    function getNextProperty(path) {
+        if (is(path, 'string')) {
+            return path;
+        }
+        if (is(path, 'array') && path.length > 1) {
+            return path.shift(1);
+        }
+        return undefined;
+    }
+
+    // Take an array and return an array compatible with select2
+    function mapArray(array, idPath, textPath, childPath) {
+        return array.map(function (d) {
+            var children,
+                id,
+                text,
+                currentChildPath = getProperty(childPath),
+                currentIDPath = getProperty(idPath),
+                currentTextPath = getProperty(textPath);
+
+            // ----Proccess text field----
+            if (currentTextPath) {
+                text = d[currentTextPath];
             } else if (is(d, 'string')) {
                 text = d;
             } else { //TODO add isformatted boolean and base this off that
                 console.warn('Input has not specified text field');
-                text = "";
+                text = "No Text Specified";
             }
 
-            if (childpath) {
-                return { text: text, children: d[childpath] };
+            // ----Deal with nodes with children----
+            if (d.hasOwnProperty(currentChildPath)) {
+                children = mapArray(d[currentChildPath], getNextProperty(idPath), getNextProperty(textPath), getNextProperty(childPath))
+                return { text: text, children: children };
             }
+
+            // ----Deal with object nodes----
+            id = currentIDPath ? d[currentIDPath] : d;
             return { text: text, id: id };
+            
         });
     }
 
