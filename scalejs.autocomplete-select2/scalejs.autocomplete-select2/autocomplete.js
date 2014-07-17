@@ -42,7 +42,7 @@ define([
     }
 
     // Take an array and return an array compatible with select2
-    function mapArray(array, idPath, textPath, childPath) {
+    function mapArray(array, idPath, textPath, childPath, selectableParents) {
         return array.map(function (d) {
             var children,
                 id,
@@ -64,11 +64,16 @@ define([
             // ----Deal with nodes with children----
             if (d.hasOwnProperty(currentChildPath)) {
                 children = mapArray(d[currentChildPath], getNextProperty(idPath), getNextProperty(textPath), getNextProperty(childPath))
-                return { text: text, children: children };
+                if (!selectableParents) {
+                    return { text: text, children: children };
+                }
             }
 
             // ----Deal with object nodes----
             id = currentIDPath ? d[currentIDPath] : d;
+            if (selectableParents) {
+                return { text: text, id: id, children: children };
+            }
             return { text: text, id: id };
             
         });
@@ -93,6 +98,7 @@ define([
             userInput =             value.queryText,
             selectedItem =          value.selectedItem,
             data =                  value.itemsSource,
+            selectableParents =     value.selectableParents,
             // Temporary variables
             dummyDiv,
             queryComputed;
@@ -108,7 +114,7 @@ define([
                     queryComputed.dispose();
                 }
                 queryComputed = computed(function () {
-                    data = { results: mapArray(itemsToShow(), idpath, textpath, childpath) };
+                    data = { results: mapArray(itemsToShow(), idpath, textpath, childpath, selectableParents) };
                     if (!is(data.results, 'array')) {
                         console.warn('itemsToShow must return an array');
                         data.results = [];
@@ -119,11 +125,11 @@ define([
         } else if (data) {
             if (isObservable(data)) {
                 select2.data = function () {
-                    var results = mapArray(data(), idpath, textpath, childpath);
+                    var results = mapArray(data(), idpath, textpath, childpath, selectableParents);
                     return { results: results };
                 };
             } else {// its just a plain array
-                select2.data = mapArray(data, idpath, textpath, childpath);
+                select2.data = mapArray(data, idpath, textpath, childpath, selectableParents);
             }
         }
 
