@@ -89,7 +89,7 @@ define([
             container,
             input,
             // Important Values from accessor
-            itemsToShow =           value.itemsToShow,
+            itemsSource =           value.itemsSource,
             itemTemplate =          value.itemTemplate,
             selectedItemTemplate =  value.selectedItemTemplate,
             idpath =                value.idpath,
@@ -97,8 +97,8 @@ define([
             childpath =             value.childpath,
             userInput =             value.queryText,
             selectedItem =          value.selectedItem,
-            data =                  value.itemsSource,
-            selectGroupNodes = value.selectGroupNodes,
+            selectGroupNodes =      value.selectGroupNodes,
+            customFiltering =       value.customFiltering,
             // Temporary variables
             dummyDiv,
             queryComputed;
@@ -108,13 +108,13 @@ define([
             select2 = {};
         }
         // If they passed itemsToShow, display all of them, else let select2 handle the search
-        if (itemsToShow) {
+        if (customFiltering) {
             select2.query = function (query) {
                 if (queryComputed) {
                     queryComputed.dispose();
                 }
                 queryComputed = computed(function () {
-                    data = { results: mapArray(itemsToShow(), idpath, textpath, childpath, selectGroupNodes) };
+                    data = { results: mapArray(itemsSource(), idpath, textpath, childpath, selectGroupNodes) };
                     if (!is(data.results, 'array')) {
                         console.warn('itemsToShow must return an array');
                         data.results = [];
@@ -122,14 +122,14 @@ define([
                     query.callback(data);
                 });
             };
-        } else if (data) {
-            if (isObservable(data)) {
+        } else {
+            if (isObservable(itemsSource)) {
                 select2.data = function () {
-                    var results = mapArray(data(), idpath, textpath, childpath, selectGroupNodes);
+                    var results = mapArray(itemsSource(), idpath, textpath, childpath, selectGroupNodes);
                     return { results: results };
                 };
-            } else {// its just a plain array
-                select2.data = mapArray(data, idpath, textpath, childpath, selectGroupNodes);
+            } else if (itemsSource) {// its just a plain array
+                select2.data = mapArray(itemsSource, idpath, textpath, childpath, selectGroupNodes);
             }
         }
 
