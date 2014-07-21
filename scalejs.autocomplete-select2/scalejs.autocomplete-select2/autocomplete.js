@@ -169,9 +169,11 @@ define([
         $(element).select2(select2);
 
         // Make sure knockout updates correctly
-        $(element).on("change", function (o) {
-            selectedItem(o.val);
-        });
+        if (selectedItem) {
+            $(element).on("change", function (o) {
+                selectedItem(o.val);
+            });
+        }
 
         // ----Handle the user text input----
 
