@@ -25,13 +25,17 @@ The user's selection is returned to the viewmodel through the knockout observabl
 
 Instead of providing data using the ```data``` paramater in the select2 object, data can also be passed using the ```itemsSource``` parameter in this binding. The autocomplete ```itemsSource``` parameter accepts an array that contains either strings or objects. If the array contains strings, autocomple will map it correctly for select2 and take care of all the details. If the array contains objects, the ```textpath``` parameter must be sent to specify the property of the object that containts the string to be rendered if no template is provided. Likewise, the ```idpath``` parameter must be provided to specify which property contains the data returned on selection, else the entire object will be the selected value.
 
+## hierarchical data
+
+This extension supports infinite levels of hierarchical data. Simply specify a ```childpath``` as a string or array of strings, and the binding will indent and layer each level of your data.
+
 ## Dynamic Data Loading
 
 The ```itemsSource``` parameter instead of taking an array can also take an observable. If an observable is passed, before every search the binding will get the most updated value it contains and use that to search from.
 
 ## Viewmodel Filtering
 
-If a user provides a computed function that computes an array of results based on the ```userInput``` observable, then instead of using select2's search, the binding will use the returned array as the results for the search, allowing for all comparision and filtering logic to be done in the viewmodel.
+All filtering can be done in the viewmodel without passing any functions to select2. If the parameter ```customFiltering``` is set to ```true```, then the results of the dropdown will be exactly what is currently in the ```itemsSource```, and can be easily created as a computed function depending on ```userInput```.
 
 # Examples
 
