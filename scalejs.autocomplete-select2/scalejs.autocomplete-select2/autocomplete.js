@@ -1,4 +1,5 @@
-﻿define([
+﻿/*global define, console, document*/
+define([
     'scalejs!core',
     'knockout',
     'jQuery',
@@ -19,26 +20,66 @@
         merge = core.object.merge,
         is = core.type.is;
 
-    // Take an array and return an array compatible with select2
-    function mapArray(array, idpath, textpath) {
-        return array.map(function (d) {
-            var id = (idpath) ? d[idpath] : d,
-                text;
+    function getProperty(path) {
+        if (is(path, 'string')) {
+            return path;
+        }
+        if (is(path, 'array') && path.length > 0) {
+            return path[0];
+        }
+        return undefined;
+    }
 
-            if (textpath) {
-                text = d[textpath];
+    // Get the childpath for the next level of heiarchical data
+    function getNextProperty(path) {
+        if (is(path, 'string')) {
+            return path;
+        }
+        if (is(path, 'array') && path.length > 1) {
+            return path.shift(1);
+        }
+        return undefined;
+    }
+
+    // Take an array and return an array compatible with select2
+    function mapArray(array, idPath, textPath, childPath, selectGroupNodes) {
+        return array.map(function (d) {
+            var children,
+                id,
+                text,
+                currentChildPath = getProperty(childPath),
+                currentIDPath = getProperty(idPath),
+                currentTextPath = getProperty(textPath);
+
+            // ----Proccess text field----
+            if (currentTextPath) {
+                text = d[currentTextPath];
             } else if (is(d, 'string')) {
                 text = d;
             } else { //TODO add isformatted boolean and base this off that
                 console.warn('Input has not specified text field');
-                text = "";
+                text = "No Text Specified";
             }
 
-            return { id: id, text: text }
-        })
+            // ----Deal with nodes with children----
+            if (d.hasOwnProperty(currentChildPath)) {
+                children = mapArray(d[currentChildPath], getNextProperty(idPath), getNextProperty(textPath), getNextProperty(childPath), selectGroupNodes);
+                if (!selectGroupNodes) {
+                    return { text: text, children: children };
+                }
+            }
+
+            // ----Deal with object nodes----
+            id = currentIDPath ? d[currentIDPath] : d;
+            if (selectGroupNodes) {
+                return { text: text, id: id, children: children };
+            }
+            return { text: text, id: id };
+            
+        });
     }
 
-    function initializeSelect2 (element, valueAccessor, allBindingsAccessor, viewModel) {
+    function initializeSelect2(element, valueAccessor) {
 
         var // Scope variables
             value = valueAccessor(),
@@ -48,53 +89,52 @@
             container,
             input,
             // Important Values from accessor
-            itemsToShow =           value.itemsToShow,
+            itemsSource =           value.itemsSource,
             itemTemplate =          value.itemTemplate,
             selectedItemTemplate =  value.selectedItemTemplate,
-            idpath =                value.idpath,
-            textpath =              value.textpath,
+            idpath =                value.idPath,
+            textpath =              value.textPath,
+            childpath =             value.childPath,
             userInput =             value.queryText,
             selectedItem =          value.selectedItem,
-            data =                  value.itemsSource,
+            selectGroupNodes =      value.selectGroupNodes,
+            customFiltering =       value.customFiltering,
             // Temporary variables
-            formatFunction,
             dummyDiv,
             queryComputed;
 
         // ----Set up object to pass to select2 with all it's configuration properties----
-        if ( select2 === undefined) {
+        if (select2 === undefined) {
             select2 = {};
-        } 
+        }
         // If they passed itemsToShow, display all of them, else let select2 handle the search
-        if (itemsToShow) {
+        if (customFiltering) {
             select2.query = function (query) {
                 if (queryComputed) {
                     queryComputed.dispose();
                 }
                 queryComputed = computed(function () {
-                    data = {
-                        results: mapArray(itemsToShow(), idpath, textpath)
-                    }
+                    data = { results: mapArray(itemsSource(), idpath, textpath, childpath, selectGroupNodes) };
                     if (!is(data.results, 'array')) {
                         console.warn('itemsToShow must return an array');
                         data.results = [];
                     }
                     query.callback(data);
                 });
-            }
-        } else if (data) {
-            if (isObservable(data)) {
+            };
+        } else {
+            if (isObservable(itemsSource)) {
                 select2.data = function () {
-                    var results = mapArray(data(), idpath, textpath)
+                    var results = mapArray(itemsSource(), idpath, textpath, childpath, selectGroupNodes);
                     return { results: results };
-                }
-            } else {// its just a plain array
-                select2.data = mapArray(data, idpath, textpath);
+                };
+            } else if (itemsSource) {// its just a plain array
+                select2.data = mapArray(itemsSource, idpath, textpath, childpath, selectGroupNodes);
             }
         }
 
         // ----handle templating----
-        if ( itemTemplate ) {
+        if (itemTemplate) {
 
             // Create div to render templates inside to get the html to pass to select2
             $('body').append('<div id="dummy_div" data-bind="template: { name: template, data: data }"></div>');
@@ -107,12 +147,12 @@
                     // Clear Dummy Div html node
                     dummyDiv.innerText = '';
                     // render template with (d)
-                    ko.applyBindings({ template: templateString, data: (idpath)? d : d.id }, dummyDiv);
+                    ko.applyBindings({ template: templateString, data: idpath ? d : d.id }, dummyDiv);
 
                     // give rendered data to select2
                     return dummyDiv.innerHTML;
-                }
-            }
+                };
+            };
 
             select2.formatResult = createFormatFunction(itemTemplate);
             select2.formatSelection = select2.formatResult;
@@ -121,7 +161,7 @@
                 select2.formatSelection = createFormatFunction(selectedItemTemplate);
             }
             if (!select2.hasOwnProperty('escapeMarkup')) {
-                select2.escapeMarkup = function (m) { return m; }
+                select2.escapeMarkup = function (m) { return m; };
             }
         }
 
@@ -129,9 +169,11 @@
         $(element).select2(select2);
 
         // Make sure knockout updates correctly
-        $(element).on("change", function (o) {
-            selectedItem(o.val);
-        });
+        if (selectedItem) {
+            $(element).on("change", function (o) {
+                selectedItem(o.val);
+            });
+        }
 
         // ----Handle the user text input----
 
@@ -140,12 +182,12 @@
 
         if (userInput) {
             // Push the user input to the viewmodel
-            $(input).on("keyup", function (o) {
+            $(input).on("keyup", function () {
                 userInput($(input).val());
             });
 
             // Make sure that the last user input repopulates the input box when reopened
-            $(element).on("select2-open", function (o) {
+            $(element).on("select2-open", function () {
                 $(input).val(userInput());
             });
         }
