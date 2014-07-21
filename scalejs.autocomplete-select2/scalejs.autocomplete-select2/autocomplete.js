@@ -107,7 +107,7 @@ define([
         if (select2 === undefined) {
             select2 = {};
         }
-        // If they passed itemsToShow, display all of them, else let select2 handle the search
+        // If customFiltering is enabled, display all of them, else let select2 handle the search
         if (customFiltering) {
             select2.query = function (query) {
                 if (queryComputed) {
@@ -124,6 +124,7 @@ define([
             };
         } else {
             if (isObservable(itemsSource)) {
+                // Select2 will execute a function passed as a data paramater, and this is the best way to push data through an observable to select2
                 select2.data = function () {
                     var results = mapArray(itemsSource(), idpath, textpath, childpath, selectGroupNodes);
                     return { results: results };
@@ -160,7 +161,8 @@ define([
             if (selectedItemTemplate) {
                 select2.formatSelection = createFormatFunction(selectedItemTemplate);
             }
-            if (!select2.hasOwnProperty('escapeMarkup')) {
+            // This function is run on the data, and by default removes HTML, so we override it to render our templated HTML
+            if (!select2.hasOwnProperty('escapeMarkup')) { 
                 select2.escapeMarkup = function (m) { return m; };
             }
         }
