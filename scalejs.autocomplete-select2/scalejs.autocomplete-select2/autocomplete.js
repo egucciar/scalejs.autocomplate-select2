@@ -15,9 +15,7 @@ define([
     var // Imports
         observable = ko.observable,
         computed = ko.computed,
-        unwrap = ko.unwrap,
         isObservable = ko.isObservable,
-        merge = core.object.merge,
         is = core.type.is;
 
     function getProperty(path) {
@@ -45,7 +43,7 @@ define([
             }
             return newPath;
         }
-        console.warn('malformed datawhen advancing property', path);
+        console.warn('malformed data when advancing property', path);
         return undefined;
     }
 
