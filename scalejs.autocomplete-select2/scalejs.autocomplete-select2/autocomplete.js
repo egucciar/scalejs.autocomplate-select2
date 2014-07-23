@@ -73,16 +73,16 @@ define([
             if (d.hasOwnProperty(currentChildPath)) {
                 children = mapArray(d[currentChildPath], getNextProperty(idPath), getNextProperty(textPath), getNextProperty(childPath), selectGroupNodes);
                 if (!selectGroupNodes) {
-                    return { text: text, children: children };
+                    return { text: text, children: children, original: d };
                 }
             }
 
             // ----Deal with object nodes----
             id = currentIDPath ? d[currentIDPath] : d;
             if (selectGroupNodes) {
-                return { text: text, id: id, children: children };
+                return { text: text, id: id, children: children, original: d };
             }
-            return { text: text, id: id };
+            return { text: text, id: id, original: d };
         });
     }
 
@@ -155,7 +155,7 @@ define([
                     // Clear Dummy Div html node
                     dummyDiv.innerText = '';
                     // render template with (d)
-                    ko.applyBindings({ template: templateString, data: idpath ? d : d.id }, dummyDiv);
+                    ko.applyBindings({ template: templateString, data: d.original }, dummyDiv);
 
                     // give rendered data to select2
                     return dummyDiv.innerHTML;
