@@ -42,8 +42,8 @@ All filtering can be done in the viewmodel without passing any functions to sele
 
 ```javascript
 autocomplete: {
-    itemsSource = ['a', 'b', 'c'],
-    selectedItem = this.anyObservable
+    itemsSource: ['Nick', 'Conor', 'Nissam', 'Serge', 'Jeremy', 'Peter'],
+    selectedItem: this.selectedItem,
 }
 ```
 
@@ -53,13 +53,16 @@ autocomplete: {
 autocomplete: {
     select2: {
         placeholder: 'Placeholder Text',
-        allowClear: true
+        allowClear: true,
     },
-    selectedItem: this.someObservable,
-    userInput: this.anotherObservable,
-    itemsToShow: this.computedFilteringFunction,
-    textpath: 'textproperty',
-    idpath: 'idproperty'
+    itemsSource: this.dataObservable,
+    selectedItem: this.selectedItemObservable,
+    queryText: this.userInputObservable,
+    textPath: 'name',
+    idPath: 'name',
+    childPath: 'children',
+    selectGroupNodes: true,
+    itemTemplate: "autocomplete_item_template"
 }
 ```
 
