@@ -13,7 +13,6 @@ define([
     "use strict";
 
     var // Imports
-        observable = ko.observable,
         computed = ko.computed,
         isObservable = ko.isObservable,
         is = core.type.is;
@@ -62,8 +61,7 @@ define([
                 text = d[currentTextPath];
             } else if (is(d, 'string')) {
                 text = d;
-            } else { //TODO add isformatted boolean and base this off that
-                console.warn('Input has not specified text field');
+            } else {// Not fatal since formatting will make this field useless
                 text = "No Text Specified";
             }
 
@@ -112,6 +110,7 @@ define([
         if (select2 === undefined) {
             select2 = {};
         }
+
         // If customFiltering is enabled, display all of them, else let select2 handle the search
         if (customFiltering) {
             select2.query = function (query) {
@@ -142,16 +141,21 @@ define([
         // ----handle templating----
         if (itemTemplate) {
 
-            // Create div to render templates inside to get the html to pass to select2
-            $('body').append('<div id="dummy_div" data-bind="template: { name: template, data: data }"></div>');
-            dummyDiv = document.getElementById("dummy_div");
-            $(dummyDiv).hide();
+            // Create div to render templates inside to get the html to pass to select2, then hide it
+            if (document.getElementById("scalejs_autocomplete_dummy_div") === null) {
+                $('body').append('<div id="scalejs_autocomplete_dummy_div" data-bind="template: { name: template, data: data }"></div>');
+                dummyDiv = document.getElementById("scalejs_autocomplete_dummy_div");
+                $(dummyDiv).hide();
+            }
 
             createFormatFunction = function (templateString) {
                 return function (d) {
+
                     ko.cleanNode(dummyDiv);
+
                     // Clear Dummy Div html node
                     dummyDiv.innerText = '';
+
                     // render template with (d)
                     ko.applyBindings({ template: templateString, data: d.original }, dummyDiv);
 
