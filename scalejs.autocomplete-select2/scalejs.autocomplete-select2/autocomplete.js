@@ -32,12 +32,20 @@ define([
 
     // Get the childpath for the next level of heiarchical data
     function getNextProperty(path) {
+        var newPath;
+
         if (is(path, 'string')) {
             return path;
         }
         if (is(path, 'array') && path.length > 1) {
-            return path.shift(1);
+            newPath = path.slice();
+            newPath.shift(1);
+            if (newPath.length === 1) {
+                return newPath[0];
+            }
+            return newPath;
         }
+        console.warn('malformed datawhen advancing property', path);
         return undefined;
     }
 
@@ -75,7 +83,6 @@ define([
                 return { text: text, id: id, children: children };
             }
             return { text: text, id: id };
-            
         });
     }
 
@@ -84,7 +91,6 @@ define([
         var // Scope variables
             value = valueAccessor(),
             select2 = value.select2,
-            userIsHandlingFormatting,
             createFormatFunction,
             container,
             input,
@@ -101,6 +107,7 @@ define([
             customFiltering =       value.customFiltering,
             // Temporary variables
             dummyDiv,
+            data,
             queryComputed;
 
         // ----Set up object to pass to select2 with all it's configuration properties----
@@ -162,7 +169,7 @@ define([
                 select2.formatSelection = createFormatFunction(selectedItemTemplate);
             }
             // This function is run on the data, and by default removes HTML, so we override it to render our templated HTML
-            if (!select2.hasOwnProperty('escapeMarkup')) { 
+            if (!select2.hasOwnProperty('escapeMarkup')) {
                 select2.escapeMarkup = function (m) { return m; };
             }
         }
