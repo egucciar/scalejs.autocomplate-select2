@@ -1,40 +1,37 @@
 ﻿/*global define, console, document*/
 define([
-    'scalejs!core',
     'knockout',
     'formatter',
     'template',
     'subscribe',
+    'query',
     'jQuery',
     'select2',
     'scalejs.mvvm'
 ], function (
-    core,
     ko,
     formatter,
     template,
     subscribe,
+    query,
     $
 ) {
     "use strict";
 
     var // Imports
-        computed = ko.computed,
         isObservable = ko.isObservable,
-        is = core.type.is,
         mapItems = formatter.mapItems,
         createDummyDiv = template.createDummyDiv,
         createFormatFunction = template.createFormatFunction,
         subscribeToSelectedItem = subscribe.subscribeToSelectedItem,
-        subscribeToUserInput = subscribe.subscribeToUserInput;
+        subscribeToUserInput = subscribe.subscribeToUserInput,
+        generateQueryFunction = query.generateQueryFunction;
 
     function initializeSelect2(element, valueAccessor) {
 
         var // Scope variables
             value = valueAccessor(),
             select2 = value.select2,
-            container,
-            input,
             // Important Values from accessor
             itemsSource =           value.itemsSource,
             itemTemplate =          value.itemTemplate,
@@ -45,10 +42,7 @@ define([
             userInput =             value.queryText,
             selectedItem =          value.selectedItem,
             selectGroupNodes =      value.selectGroupNodes,
-            customFiltering =       value.customFiltering,
-            // Temporary variables
-            data,
-            queryComputed;
+            customFiltering =       value.customFiltering;
 
         // ----Set up object to pass to select2 with all it's configuration properties----
         if (select2 === undefined || select2 === null) {
@@ -57,19 +51,7 @@ define([
 
         // If customFiltering is enabled, display all of them, else let select2 handle the search
         if (customFiltering) {
-            select2.query = function (query) {
-                if (queryComputed) {
-                    queryComputed.dispose();
-                }
-                queryComputed = computed(function () {
-                    data = { results: mapItems(itemsSource(), idpath, textpath, childpath, selectGroupNodes) };
-                    if (!is(data.results, 'array')) {
-                        console.warn('itemsToShow must return an array');
-                        data.results = [];
-                    }
-                    query.callback(data);
-                });
-            };
+            select2.query = generateQueryFunction(itemsSource, idpath, textpath, childpath, selectGroupNodes);
         } else {
             if (isObservable(itemsSource)) {
                 // Select2 will execute a function passed as a data paramater, and this is the best way to push data through an observable to select2

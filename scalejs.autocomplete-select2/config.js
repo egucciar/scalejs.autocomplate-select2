@@ -7,7 +7,8 @@ var require = {
         "scalejs.mvvm": "empty:",
         "formatter": "scalejs.autocomplete-select2/formatter",
         "template": "scalejs.autocomplete-select2/template",
-        "subscribe": "scalejs.autocomplete-select2/subscribe"
+        "subscribe": "scalejs.autocomplete-select2/subscribe",
+        "query": "scalejs.autocomplete-select2/query"
     },
     "shim": {
         "select2": {

@@ -19,6 +19,7 @@
     <Content Include="scalejs.autocomplete-select2.js" />
     <Content Include="scalejs.autocomplete-select2\autocomplete.js" />
     <Content Include="scalejs.autocomplete-select2\formatter.js" />
+    <Content Include="scalejs.autocomplete-select2\query.js" />
     <Content Include="scalejs.autocomplete-select2\subscribe.js" />
     <Content Include="scalejs.autocomplete-select2\template.js" />
     <Content Include="Scripts\scalejs-0.3.3.js" />
