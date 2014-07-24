@@ -45,7 +45,7 @@ define([
             queryComputed;
 
         // ----Set up object to pass to select2 with all it's configuration properties----
-        if (select2 === undefined) {
+        if (select2 === undefined || select2 === null) {
             select2 = {};
         }
 
