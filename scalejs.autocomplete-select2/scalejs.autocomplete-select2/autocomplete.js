@@ -94,7 +94,9 @@ define([
                     ko.cleanNode(dummyDiv);
 
                     // Clear Dummy Div html node
-                    dummyDiv.innerText = '';
+                    while (dummyDiv.firstChild) {
+                        dummyDiv.removeChild(dummyDiv.firstChild);
+                    }
 
                     // render template with (d)
                     ko.applyBindings({ template: templateString, data: d.original }, dummyDiv);
