@@ -3,6 +3,7 @@ define([
     'scalejs!core',
     'knockout',
     'formatter',
+    'template',
     'jQuery',
     'select2',
     'scalejs.mvvm'
@@ -10,6 +11,7 @@ define([
     core,
     ko,
     formatter,
+    template,
     $
 ) {
     "use strict";
@@ -18,7 +20,8 @@ define([
         computed = ko.computed,
         isObservable = ko.isObservable,
         is = core.type.is,
-        mapItems = formatter.mapItems;
+        mapItems = formatter.mapItems,
+        createDummyDiv = template.createDummyDiv;
 
     function initializeSelect2(element, valueAccessor) {
 
@@ -80,11 +83,7 @@ define([
         if (itemTemplate) {
 
             // Create div to render templates inside to get the html to pass to select2, then hide it
-            if (document.getElementById("scalejs_autocomplete_dummy_div") === null) {
-                dummyDiv = document.createElement('div');
-                $(dummyDiv).hide();
-                dummyDiv.setAttribute("data-bind", "template: { name: template, data: data }");
-            }
+            dummyDiv = createDummyDiv();
 
             createFormatFunction = function (templateString) {
                 return function (d) {
