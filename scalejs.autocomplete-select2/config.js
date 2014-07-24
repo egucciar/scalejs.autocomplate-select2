@@ -5,7 +5,7 @@ var require = {
         "jQuery": "empty:",
         "knockout": "empty:",
         "scalejs.mvvm": "empty:",
-        "formatter": "scalejs.autocomplete-select2/formatter",
+        "map-items": "scalejs.autocomplete-select2/map-items",
         "template": "scalejs.autocomplete-select2/template",
         "query": "scalejs.autocomplete-select2/query"
     },

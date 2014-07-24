@@ -36,7 +36,7 @@ define([
                     ? newPath[0]
                     : newPath;
         }
-        console.warn('malformed data when advancing property', path);
+        console.error('malformed data when advancing property', path);
         return undefined;
     }
 
@@ -77,7 +77,5 @@ define([
         });
     }
 
-    return {
-        mapItems: mapItems
-    };
+    return mapItems;
 });

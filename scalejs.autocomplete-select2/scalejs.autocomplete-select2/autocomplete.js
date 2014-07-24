@@ -1,7 +1,7 @@
 ﻿/*global define, console, document*/
 define([
     'knockout',
-    'formatter',
+    'map-items',
     'template',
     'query',
     'jQuery',
@@ -9,24 +9,50 @@ define([
     'scalejs.mvvm'
 ], function (
     ko,
-    formatter,
+    mapItems,
     createFormatFunction,
-    generateQueryFunction,
+    createQueryFunction,
     $
 ) {
     "use strict";
 
     var // Imports
-        isObservable = ko.isObservable,
-        mapItems = formatter.mapItems;
+        isObservable = ko.isObservable;
+
+    function subscribeToSelectedItem(selectedItem, element) {
+        if (isObservable(selectedItem)) {
+            $(element).on("change", function (o) {
+                selectedItem(o.val);
+            });
+        } else {
+            console.error('selectedItem must be an observable');
+        }
+    }
+
+    function subscribeToUserInput(userInput, element) {
+        var container = $(element).select2("container"),
+            input = $(container).find(".select2-drop .select2-search .select2-input");
+
+        if (isObservable(userInput)) {
+            // Push the user input to the viewmodel
+            $(input).on("keyup", function () {
+                userInput($(input).val());
+            });
+
+            // Make sure that the last user input repopulates the input box when reopened
+            $(element).on("select2-open", function () {
+                $(input).val(userInput());
+            });
+        } else {
+            console.error('userInput must be an observable');
+        }
+    }
 
     function init(element, valueAccessor) {
 
         var // Scope variables
             value = valueAccessor(),
             select2 = value.select2,
-            container,
-            input,
             // Important Values from accessor
             itemsSource =           value.itemsSource,
             itemTemplate =          value.itemTemplate,
@@ -46,7 +72,7 @@ define([
 
         // If customFiltering is enabled, display all of them, else let select2 handle the search
         if (customFiltering) {
-            select2.query = generateQueryFunction(itemsSource, idpath, textpath, childpath, selectGroupNodes);
+            select2.query = createQueryFunction(itemsSource, idpath, textpath, childpath, selectGroupNodes);
         } else {
             if (isObservable(itemsSource)) {
                 // Select2 will execute a function passed as a data paramater, and this is the best way to push data through an observable to select2
@@ -81,33 +107,12 @@ define([
 
         // Push item selections to viewmodel
         if (selectedItem) {
-            if (isObservable(selectedItem)) {
-                $(element).on("change", function (o) {
-                    selectedItem(o.val);
-                });
-            } else {
-                console.error('selectedItem must be an observable');
-            }
+            subscribeToSelectedItem(selectedItem, element);
         }
 
         // ----Handle the user text input----
         if (userInput) {
-            container = $(element).select2("container");
-            input = $(container).find(".select2-drop .select2-search .select2-input");
-
-            if (isObservable(userInput)) {
-                // Push the user input to the viewmodel
-                $(input).on("keyup", function () {
-                    userInput($(input).val());
-                });
-
-                // Make sure that the last user input repopulates the input box when reopened
-                $(element).on("select2-open", function () {
-                    $(input).val(userInput());
-                });
-            } else {
-                console.error('userInput must be an observable');
-            }
+            subscribeToUserInput(userInput, element);
         }
 
         // ----Set up the disposal of select2----

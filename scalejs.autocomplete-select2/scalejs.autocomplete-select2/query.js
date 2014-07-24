@@ -2,23 +2,22 @@
 define([
     'scalejs!core',
     'knockout',
-    'formatter'
+    'map-items'
 ], function (
     core,
     ko,
-    formatter
+    mapItems
 ) {
     "use strict";
 
     var // Imports
         computed = ko.computed,
         is = core.type.is,
-        mapItems = formatter.mapItems,
         // Variables
         data,
         queryComputed;
 
-    function generateQueryFunction(itemsSource, idpath, textpath, childpath, selectGroupNodes) {
+    function createQueryFunction(itemsSource, idpath, textpath, childpath, selectGroupNodes) {
         return function (query) {
             if (queryComputed) {
                 queryComputed.dispose();
@@ -34,5 +33,5 @@ define([
         };
     }
 
-    return generateQueryFunction;
+    return createQueryFunction;
 });

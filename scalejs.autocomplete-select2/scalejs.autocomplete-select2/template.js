@@ -21,8 +21,6 @@ define([
             $(dummyDiv).hide();
             dummyDiv.setAttribute("data-bind", "template: { name: template, data: data }");
         }
-
-        return dummyDiv;
     }
 
     function createFormatFunction(templateString) {
