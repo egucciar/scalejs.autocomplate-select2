@@ -2,12 +2,14 @@
 define([
     'scalejs!core',
     'knockout',
+    'formatter',
     'jQuery',
     'select2',
     'scalejs.mvvm'
 ], function (
     core,
     ko,
+    formatter,
     $
 ) {
     "use strict";
@@ -15,73 +17,8 @@ define([
     var // Imports
         computed = ko.computed,
         isObservable = ko.isObservable,
-        is = core.type.is;
-
-    // Gets the property for the current level from a path.
-    function getProperty(path) {
-        if (is(path, 'string')) {
-            return path;
-        }
-        if (is(path, 'array') && path.length > 0) {
-            return path[0];
-        }
-        return undefined;
-    }
-
-    // Change the path so that it is correct for the next level of data.
-    function getNextProperty(path) {
-        var newPath;
-
-        if (is(path, 'string')) {
-            return path;
-        }
-        if (is(path, 'array') && path.length > 1) {
-            newPath = path.slice();
-            newPath.shift(1);
-            return newPath.length === 1
-                    ? newPath[0]
-                    : newPath;
-        }
-        console.warn('malformed data when advancing property', path);
-        return undefined;
-    }
-
-    // Take an array and return an array compatible with select2
-    function mapArray(array, idPath, textPath, childPath, selectGroupNodes) {
-        return array.map(function (d) {
-            var children,
-                id,
-                text,
-                currentChildPath = getProperty(childPath),
-                currentIDPath = getProperty(idPath),
-                currentTextPath = getProperty(textPath);
-
-            // ----Proccess text field----
-            if (currentTextPath) {
-                text = d[currentTextPath];
-            } else if (is(d, 'string')) {
-                text = d;
-            } else {// Not fatal since formatting will make this field useless
-                text = "No Text Specified";
-            }
-
-            // ----Deal with nodes with children----
-            if (d.hasOwnProperty(currentChildPath)) {
-                children = mapArray(d[currentChildPath], getNextProperty(idPath), getNextProperty(textPath), getNextProperty(childPath), selectGroupNodes);
-                if (!selectGroupNodes) {
-                    return { text: text, children: children, original: d };
-                }
-            }
-
-            // ----Deal with selectable nodes----
-            id = currentIDPath ? d[currentIDPath] : d;
-
-            if (selectGroupNodes) {
-                return { text: text, id: id, children: children, original: d };
-            }
-            return { text: text, id: id, original: d };
-        });
-    }
+        is = core.type.is,
+        mapItems = formatter.mapItems;
 
     function initializeSelect2(element, valueAccessor) {
 
@@ -119,7 +56,7 @@ define([
                     queryComputed.dispose();
                 }
                 queryComputed = computed(function () {
-                    data = { results: mapArray(itemsSource(), idpath, textpath, childpath, selectGroupNodes) };
+                    data = { results: mapItems(itemsSource(), idpath, textpath, childpath, selectGroupNodes) };
                     if (!is(data.results, 'array')) {
                         console.warn('itemsToShow must return an array');
                         data.results = [];
@@ -131,11 +68,11 @@ define([
             if (isObservable(itemsSource)) {
                 // Select2 will execute a function passed as a data paramater, and this is the best way to push data through an observable to select2
                 select2.data = function () {
-                    var results = mapArray(itemsSource(), idpath, textpath, childpath, selectGroupNodes);
+                    var results = mapItems(itemsSource(), idpath, textpath, childpath, selectGroupNodes);
                     return { results: results }; // this has to be an object due to this being an undocumented select2 feature
                 };
             } else if (itemsSource) {// its just a plain array
-                select2.data = mapArray(itemsSource, idpath, textpath, childpath, selectGroupNodes);
+                select2.data = mapItems(itemsSource, idpath, textpath, childpath, selectGroupNodes);
             }
         }
 

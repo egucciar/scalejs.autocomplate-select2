@@ -4,7 +4,8 @@ var require = {
         "select2": "empty:",
         "jQuery": "empty:",
         "knockout": "empty:",
-        "scalejs.mvvm": "empty:"
+        "scalejs.mvvm": "empty:",
+        "formatter": "scalejs.autocomplete-select2/formatter"
     },
     "shim": {
         "select2": {
