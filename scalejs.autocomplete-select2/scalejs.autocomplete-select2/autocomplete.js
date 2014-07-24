@@ -17,6 +17,7 @@ define([
         isObservable = ko.isObservable,
         is = core.type.is;
 
+    // Gets the property for the current level from a path.
     function getProperty(path) {
         if (is(path, 'string')) {
             return path;
@@ -27,7 +28,7 @@ define([
         return undefined;
     }
 
-    // Get the childpath for the next level of heiarchical data
+    // Change the path so that it is correct for the next level of data.
     function getNextProperty(path) {
         var newPath;
 
@@ -73,8 +74,9 @@ define([
                 }
             }
 
-            // ----Deal with object nodes----
+            // ----Deal with selectable nodes----
             id = currentIDPath ? d[currentIDPath] : d;
+
             if (selectGroupNodes) {
                 return { text: text, id: id, children: children, original: d };
             }
@@ -164,9 +166,11 @@ define([
                 };
             };
 
+            // Make select2 apply this template to all items
             select2.formatResult = createFormatFunction(itemTemplate);
             select2.formatSelection = select2.formatResult;
 
+            // If the user gave a more specific template for seletcted item, use that instead
             if (selectedItemTemplate) {
                 select2.formatSelection = createFormatFunction(selectedItemTemplate);
             }
