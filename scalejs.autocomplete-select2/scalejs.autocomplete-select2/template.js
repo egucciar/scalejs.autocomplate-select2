@@ -1,8 +1,10 @@
-﻿/*global define, console*/
+﻿/*global define, console, document*/
 define([
-    'knockout'
+    'knockout',
+    'jQuery'
 ], function (
-    ko
+    ko,
+    $
 ) {
     "use strict";
 
@@ -23,7 +25,7 @@ define([
         return dummyDiv;
     }
 
-    function createFormatFunction (templateString) {
+    function createFormatFunction(templateString) {
         return function (d) {
 
             cleanNode(dummyDiv);
@@ -39,10 +41,10 @@ define([
             // give rendered data to select2
             return dummyDiv.innerHTML;
         };
-    };
+    }
 
     return {
         createDummyDiv: createDummyDiv,
         createFormatFunction: createFormatFunction
-    }
+    };
 });
