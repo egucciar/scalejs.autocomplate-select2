@@ -4,6 +4,7 @@ define([
     'knockout',
     'formatter',
     'template',
+    'subscribe',
     'jQuery',
     'select2',
     'scalejs.mvvm'
@@ -12,6 +13,7 @@ define([
     ko,
     formatter,
     template,
+    subscribe,
     $
 ) {
     "use strict";
@@ -22,7 +24,9 @@ define([
         is = core.type.is,
         mapItems = formatter.mapItems,
         createDummyDiv = template.createDummyDiv,
-        createFormatFunction = template.createFormatFunction;
+        createFormatFunction = template.createFormatFunction,
+        subscribeToSelectedItem = subscribe.subscribeToSelectedItem,
+        subscribeToUserInput = subscribe.subscribeToUserInput;
 
     function initializeSelect2(element, valueAccessor) {
 
@@ -101,37 +105,14 @@ define([
         // Pass all the set up properties to the select2 constructor and instantiate the select2 box
         $(element).select2(select2);
 
-        // Make sure knockout updates correctly
+        // Push item selections to viewmodel
         if (selectedItem) {
-            if (isObservable(selectedItem)) {
-                $(element).on("change", function (o) {
-                    selectedItem(o.val);
-                });
-            } else {
-                console.error('selectedItem must be an observable');
-            }
-            
+            subscribeToSelectedItem(selectedItem, element);
         }
 
         // ----Handle the user text input----
-
-        container = $(element).select2("container");
-        input = $(container).find(".select2-drop .select2-search .select2-input");
-
         if (userInput) {
-            if (isObservable(userInput)) {
-                // Push the user input to the viewmodel
-                $(input).on("keyup", function () {
-                    userInput($(input).val());
-                });
-
-                // Make sure that the last user input repopulates the input box when reopened
-                $(element).on("select2-open", function () {
-                    $(input).val(userInput());
-                });
-            } else {
-                console.error('userInput must be an observable');
-            }
+            subscribeToUserInput(userInput, element);
         }
 
         // ----Set up the disposal of select2----

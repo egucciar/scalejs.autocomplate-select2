@@ -6,7 +6,8 @@ var require = {
         "knockout": "empty:",
         "scalejs.mvvm": "empty:",
         "formatter": "scalejs.autocomplete-select2/formatter",
-        "template": "scalejs.autocomplete-select2/template"
+        "template": "scalejs.autocomplete-select2/template",
+        "subscribe": "scalejs.autocomplete-select2/subscribe"
     },
     "shim": {
         "select2": {
