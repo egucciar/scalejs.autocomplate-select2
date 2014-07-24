@@ -123,9 +123,14 @@ define([
 
         // Make sure knockout updates correctly
         if (selectedItem) {
-            $(element).on("change", function (o) {
-                selectedItem(o.val);
-            });
+            if (isObservable(selectedItem)) {
+                $(element).on("change", function (o) {
+                    selectedItem(o.val);
+                });
+            } else {
+                
+            }
+            
         }
 
         // ----Handle the user text input----
@@ -134,15 +139,19 @@ define([
         input = $(container).find(".select2-drop .select2-search .select2-input");
 
         if (userInput) {
-            // Push the user input to the viewmodel
-            $(input).on("keyup", function () {
-                userInput($(input).val());
-            });
+            if (isObservable(userInput)) {
+                // Push the user input to the viewmodel
+                $(input).on("keyup", function () {
+                    userInput($(input).val());
+                });
 
-            // Make sure that the last user input repopulates the input box when reopened
-            $(element).on("select2-open", function () {
-                $(input).val(userInput());
-            });
+                // Make sure that the last user input repopulates the input box when reopened
+                $(element).on("select2-open", function () {
+                    $(input).val(userInput());
+                });
+            } else {
+                console.error('userInput must be an observable');
+            }
         }
 
         // ----Set up the disposal of select2----
