@@ -21,14 +21,14 @@ define([
         isObservable = ko.isObservable,
         is = core.type.is,
         mapItems = formatter.mapItems,
-        createDummyDiv = template.createDummyDiv;
+        createDummyDiv = template.createDummyDiv,
+        createFormatFunction = template.createFormatFunction;
 
     function initializeSelect2(element, valueAccessor) {
 
         var // Scope variables
             value = valueAccessor(),
             select2 = value.select2,
-            createFormatFunction,
             container,
             input,
             // Important Values from accessor
@@ -43,7 +43,6 @@ define([
             selectGroupNodes =      value.selectGroupNodes,
             customFiltering =       value.customFiltering,
             // Temporary variables
-            dummyDiv,
             data,
             queryComputed;
 
@@ -83,25 +82,7 @@ define([
         if (itemTemplate) {
 
             // Create div to render templates inside to get the html to pass to select2, then hide it
-            dummyDiv = createDummyDiv();
-
-            createFormatFunction = function (templateString) {
-                return function (d) {
-
-                    ko.cleanNode(dummyDiv);
-
-                    // Clear Dummy Div html node
-                    while (dummyDiv.firstChild) {
-                        dummyDiv.removeChild(dummyDiv.firstChild);
-                    }
-
-                    // render template with (d)
-                    ko.applyBindings({ template: templateString, data: d.original }, dummyDiv);
-
-                    // give rendered data to select2
-                    return dummyDiv.innerHTML;
-                };
-            };
+            createDummyDiv();
 
             // Make select2 apply this template to all items
             select2.formatResult = createFormatFunction(itemTemplate);
@@ -127,7 +108,7 @@ define([
                     selectedItem(o.val);
                 });
             } else {
-                
+                console.error('selectedItem must be an observable');
             }
             
         }

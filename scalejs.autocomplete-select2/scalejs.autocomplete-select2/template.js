@@ -1,10 +1,16 @@
 ﻿/*global define, console*/
 define([
+    'knockout'
 ], function (
+    ko
 ) {
     "use strict";
 
-    var dummyDiv;
+    var // Imports
+        cleanNode = ko.cleanNode,
+        applyBindings = ko.applyBindings,
+        // Variables
+        dummyDiv;
 
     // Create div to render templates inside to get the html to pass to select2, then hide it
     function createDummyDiv() {
@@ -17,7 +23,26 @@ define([
         return dummyDiv;
     }
 
+    function createFormatFunction (templateString) {
+        return function (d) {
+
+            cleanNode(dummyDiv);
+
+            // Clear Dummy Div html node
+            while (dummyDiv.firstChild) {
+                dummyDiv.removeChild(dummyDiv.firstChild);
+            }
+
+            // render template with (d)
+            applyBindings({ template: templateString, data: d.original }, dummyDiv);
+
+            // give rendered data to select2
+            return dummyDiv.innerHTML;
+        };
+    };
+
     return {
-        createDummyDiv: createDummyDiv
+        createDummyDiv: createDummyDiv,
+        createFormatFunction: createFormatFunction
     }
 });
