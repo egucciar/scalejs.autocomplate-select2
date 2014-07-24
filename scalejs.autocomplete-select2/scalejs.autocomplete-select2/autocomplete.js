@@ -38,10 +38,9 @@ define([
         if (is(path, 'array') && path.length > 1) {
             newPath = path.slice();
             newPath.shift(1);
-            if (newPath.length === 1) {
-                return newPath[0];
-            }
-            return newPath;
+            return newPath.length === 1
+                    ? newPath[0]
+                    : newPath;
         }
         console.warn('malformed data when advancing property', path);
         return undefined;
@@ -133,7 +132,7 @@ define([
                 // Select2 will execute a function passed as a data paramater, and this is the best way to push data through an observable to select2
                 select2.data = function () {
                     var results = mapArray(itemsSource(), idpath, textpath, childpath, selectGroupNodes);
-                    return { results: results };
+                    return { results: results }; // this has to be an object due to this being an undocumented select2 feature
                 };
             } else if (itemsSource) {// its just a plain array
                 select2.data = mapArray(itemsSource, idpath, textpath, childpath, selectGroupNodes);
@@ -145,9 +144,11 @@ define([
 
             // Create div to render templates inside to get the html to pass to select2, then hide it
             if (document.getElementById("scalejs_autocomplete_dummy_div") === null) {
-                $('body').append('<div id="scalejs_autocomplete_dummy_div" data-bind="template: { name: template, data: data }"></div>');
+                //document.createElement();
+
+                $('body').append('<div id="scalejs_autocomplete_dummy_div" data-bind="template: { name: template, data: data }" style="display: none"></div>');
                 dummyDiv = document.getElementById("scalejs_autocomplete_dummy_div");
-                $(dummyDiv).hide();
+                //$(dummyDiv).hide();
             }
 
             createFormatFunction = function (templateString) {
