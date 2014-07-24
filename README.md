@@ -2,6 +2,38 @@
 
 An autocomplete extension for scalejs based on Select2. This extension provides a way to use select2 and many of its advanced features while still following scalejs patterns. 
 
+
+## Examples
+
+### Simplest Binding
+
+```javascript
+autocomplete: {
+    itemsSource: ['Nick', 'Conor', 'Nissam', 'Serge', 'Jeremy', 'Peter'],
+    selectedItem: this.selectedItem,
+}
+```
+
+### Complex Binding
+
+```javascript
+autocomplete: {
+    select2: {
+        placeholder: 'Placeholder Text',
+        allowClear: true,
+    },
+    itemsSource: this.dataObservable,
+    selectedItem: this.selectedItemObservable,
+    queryText: this.userInputObservable,
+    textPath: 'name',
+    idPath: 'name',
+    childPath: 'children',
+    selectGroupNodes: true,
+    itemTemplate: "autocomplete_item_template"
+}
+```
+
+
 ## Features
 
 ### Direct Passing to Select2
@@ -36,44 +68,7 @@ The ```itemsSource``` parameter instead of taking an array can also take an obse
 
 All filtering can be done in the viewmodel without passing any functions to select2. If the parameter ```customFiltering``` is set to ```true```, then the results of the dropdown will be exactly what is currently in the ```itemsSource```, and can be easily created as a computed function depending on ```userInput```.
 
-## Examples
-
-### Simplest Binding
-
-```javascript
-autocomplete: {
-    itemsSource: ['Nick', 'Conor', 'Nissam', 'Serge', 'Jeremy', 'Peter'],
-    selectedItem: this.selectedItem,
-}
-```
-
-### Complex Binding
-
-```javascript
-autocomplete: {
-    select2: {
-        placeholder: 'Placeholder Text',
-        allowClear: true,
-    },
-    itemsSource: this.dataObservable,
-    selectedItem: this.selectedItemObservable,
-    queryText: this.userInputObservable,
-    textPath: 'name',
-    idPath: 'name',
-    childPath: 'children',
-    selectGroupNodes: true,
-    itemTemplate: "autocomplete_item_template"
-}
-```
 
 ## Installation
 
 Just install [this nuget package](https://www.nuget.org/packages/scalejs.autocomplete-select2/)
-
-## Browser Compatibility
-
-* IE 8+
-* Chrome 8+
-* Firefox 10+
-* Safari 3+
-* Opera 10.6+
