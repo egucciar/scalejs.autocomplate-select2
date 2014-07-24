@@ -60,8 +60,8 @@ define([
             }
 
             // ----Deal with nodes with children----
-            if (d.hasOwnProperty(currentChildPath)) {
-                children = mapArray(item[currentChildPath], getNextProperty(idPath), getNextProperty(textPath), getNextProperty(childPath), selectGroupNodes);
+            if (item.hasOwnProperty(currentChildPath)) {
+                children = mapItems(item[currentChildPath], getNextProperty(idPath), getNextProperty(textPath), getNextProperty(childPath), selectGroupNodes);
                 if (!selectGroupNodes) {
                     return { text: text, children: children, original: item };
                 }
