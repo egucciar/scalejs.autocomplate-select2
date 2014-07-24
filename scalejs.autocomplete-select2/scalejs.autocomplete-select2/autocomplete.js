@@ -81,11 +81,9 @@ define([
 
             // Create div to render templates inside to get the html to pass to select2, then hide it
             if (document.getElementById("scalejs_autocomplete_dummy_div") === null) {
-                //document.createElement();
-
-                $('body').append('<div id="scalejs_autocomplete_dummy_div" data-bind="template: { name: template, data: data }" style="display: none"></div>');
-                dummyDiv = document.getElementById("scalejs_autocomplete_dummy_div");
-                //$(dummyDiv).hide();
+                dummyDiv = document.createElement('div');
+                $(dummyDiv).hide();
+                dummyDiv.setAttribute("data-bind", "template: { name: template, data: data }");
             }
 
             createFormatFunction = function (templateString) {
