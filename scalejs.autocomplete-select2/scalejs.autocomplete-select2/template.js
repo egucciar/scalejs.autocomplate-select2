@@ -26,6 +26,7 @@ define([
     }
 
     function createFormatFunction(templateString) {
+        createDummyDiv();
         return function (d) {
 
             cleanNode(dummyDiv);
@@ -43,8 +44,5 @@ define([
         };
     }
 
-    return {
-        createDummyDiv: createDummyDiv,
-        createFormatFunction: createFormatFunction
-    };
+    return createFormatFunction;
 });

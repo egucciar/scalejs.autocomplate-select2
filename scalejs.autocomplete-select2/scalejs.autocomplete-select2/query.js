@@ -34,7 +34,5 @@ define([
         };
     }
 
-    return {
-        generateQueryFunction: generateQueryFunction
-    };
+    return generateQueryFunction;
 });

@@ -3,7 +3,6 @@ define([
     'knockout',
     'formatter',
     'template',
-    'subscribe',
     'query',
     'jQuery',
     'select2',
@@ -11,27 +10,23 @@ define([
 ], function (
     ko,
     formatter,
-    template,
-    subscribe,
-    query,
+    createFormatFunction,
+    generateQueryFunction,
     $
 ) {
     "use strict";
 
     var // Imports
         isObservable = ko.isObservable,
-        mapItems = formatter.mapItems,
-        createDummyDiv = template.createDummyDiv,
-        createFormatFunction = template.createFormatFunction,
-        subscribeToSelectedItem = subscribe.subscribeToSelectedItem,
-        subscribeToUserInput = subscribe.subscribeToUserInput,
-        generateQueryFunction = query.generateQueryFunction;
+        mapItems = formatter.mapItems;
 
-    function initializeSelect2(element, valueAccessor) {
+    function init(element, valueAccessor) {
 
         var // Scope variables
             value = valueAccessor(),
             select2 = value.select2,
+            container,
+            input,
             // Important Values from accessor
             itemsSource =           value.itemsSource,
             itemTemplate =          value.itemTemplate,
@@ -67,9 +62,6 @@ define([
         // ----handle templating----
         if (itemTemplate) {
 
-            // Create div to render templates inside to get the html to pass to select2, then hide it
-            createDummyDiv();
-
             // Make select2 apply this template to all items
             select2.formatResult = createFormatFunction(itemTemplate);
             select2.formatSelection = select2.formatResult;
@@ -89,22 +81,39 @@ define([
 
         // Push item selections to viewmodel
         if (selectedItem) {
-            subscribeToSelectedItem(selectedItem, element);
+            if (isObservable(selectedItem)) {
+                $(element).on("change", function (o) {
+                    selectedItem(o.val);
+                });
+            } else {
+                console.error('selectedItem must be an observable');
+            }
         }
 
         // ----Handle the user text input----
         if (userInput) {
-            subscribeToUserInput(userInput, element);
+            container = $(element).select2("container");
+            input = $(container).find(".select2-drop .select2-search .select2-input");
+
+            if (isObservable(userInput)) {
+                // Push the user input to the viewmodel
+                $(input).on("keyup", function () {
+                    userInput($(input).val());
+                });
+
+                // Make sure that the last user input repopulates the input box when reopened
+                $(element).on("select2-open", function () {
+                    $(input).val(userInput());
+                });
+            } else {
+                console.error('userInput must be an observable');
+            }
         }
 
         // ----Set up the disposal of select2----
         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
             $(element).select2('destroy');
         });
-    }
-
-    function init(element, valueAccessor, allBindingsAccessor, viewModel) {
-        initializeSelect2(element, valueAccessor, allBindingsAccessor, viewModel);
     }
 
     return {
