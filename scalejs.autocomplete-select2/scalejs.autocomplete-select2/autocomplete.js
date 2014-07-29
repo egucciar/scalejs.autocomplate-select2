@@ -27,8 +27,13 @@ define([
             });
 
             selectedItem.subscribe(function (newItem) {
-                if (newItem !== $(element).select2('data').id) {
-                    $(element).select2('data', newItem);
+                var oldItem = $(element).select2('data');
+                if (oldItem) {
+                    oldItem = oldItem.id;
+                }
+
+                if (newItem !== oldItem) {
+                    $(element).select2('data', mapItems([newItem])[0]);
                 }
             });
         } else {
