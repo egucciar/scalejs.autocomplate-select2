@@ -17,12 +17,19 @@ define([
     "use strict";
 
     var // Imports
+        unwrap = ko.unwrap,
         isObservable = ko.isObservable;
 
     function subscribeToSelectedItem(selectedItem, element) {
         if (isObservable(selectedItem)) {
-            $(element).on("change", function (o) {
-                selectedItem(o.val);
+            $(element).on('select2-selected', function (eventData) {
+                selectedItem(eventData.choice.id);
+            });
+
+            selectedItem.subscribe(function (newItem) {
+                if (newItem !== $(element).select2('data')) {
+                    $(element).select2('data', newItem);
+                }
             });
         } else {
             console.error('selectedItem must be an observable');
@@ -48,6 +55,16 @@ define([
         }
     }
 
+    function subscribeToReadOnly(readOnly, element) {
+        if (isObservable(readOnly)) {
+            readOnly.subscribe(function () {
+                $(element).select2("readonly", unwrap(readOnly));
+            });
+        }
+
+        $(element).select2("readonly", unwrap(readOnly));
+    }
+
     function init(element, valueAccessor) {
 
         var // Scope variables
@@ -63,7 +80,8 @@ define([
             userInput =             value.queryText,
             selectedItem =          value.selectedItem,
             selectGroupNodes =      value.selectGroupNodes,
-            customFiltering =       value.customFiltering;
+            customFiltering =       value.customFiltering,
+            readOnly =              value.disabled;
 
         // ----Set up object to pass to select2 with all it's configuration properties----
         if (select2 === undefined || select2 === null) {
@@ -104,6 +122,10 @@ define([
 
         // Pass all the set up properties to the select2 constructor and instantiate the select2 box
         $(element).select2(select2);
+
+        if (readOnly !== undefined) {
+            subscribeToReadOnly(readOnly, element);
+        }
 
         // Push item selections to viewmodel
         if (selectedItem) {
