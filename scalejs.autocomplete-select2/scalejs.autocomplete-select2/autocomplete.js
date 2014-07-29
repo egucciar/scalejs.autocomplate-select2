@@ -27,7 +27,7 @@ define([
             });
 
             selectedItem.subscribe(function (newItem) {
-                if (newItem !== $(element).select2('data')) {
+                if (newItem !== $(element).select2('data').id) {
                     $(element).select2('data', newItem);
                 }
             });
